@@ -61,3 +61,19 @@ services:
     environment:
       - ZBX_SERVER_HOST=${ZBX_SERVER_HOST}
       - TZ=${TZ}
+
+  cloudflared:
+    image: cloudflare/cloudflared
+    command:
+      - tunnel
+      - --no-autoupdate
+      - run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+      - TUNNEL_TRANSPORT_PROTOCOL=${TUNNEL_TRANSPORT_PROTOCOL}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
