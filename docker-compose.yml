@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: zabbix-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+
+  zabbix-server:
+    image: zabbix/zabbix-server-pgsql:latest # PostgreSQL サポート版
+    container_name: zabbix-server
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      - DB_SERVER_HOST=${DB_SERVER_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - ZBX_SERVER_NAME=${ZBX_SERVER_NAME}
+      - TZ=${TZ}
+
+    volumes:
+      - ./zabbix-server/alertscripts:/usr/lib/zabbix/alertscripts
+      - ./zabbix-server/externalscripts:/usr/lib/zabbix/externalscripts
+    ports:
+      - "10051:10051"
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-pgsql:latest # Nginx + PostgreSQL
+    container_name: zabbix-web
+    restart: unless-stopped
+    depends_on:
+      - zabbix-server
+      - postgres
+    environment:
+      - ZBX_SERVER_HOST=${ZBX_SERVER_HOST}
+      - DB_SERVER_HOST=${DB_SERVER_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - ZBX_DEFAULT_LANGUAGE=${ZBX_DEFAULT_LANGUAGE}
+      - LANG=${LANG}
+      - LC_ALL=${LC_ALL}
+      - PHP_TZ=${PHP_TZ}
+      - TZ=${TZ}
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent:latest # ホスト監視用エージェント
+    container_name: zabbix-agent
+    restart: unless-stopped
+    depends_on:
+      - zabbix-server
+    environment:
+      - ZBX_SERVER_HOST=${ZBX_SERVER_HOST}
+      - TZ=${TZ}
