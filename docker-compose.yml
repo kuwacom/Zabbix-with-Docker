@@ -22,6 +22,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
       - TZ=${TZ}
+      - ZBX_STARTIPMIPOLLERS=3 # IPMI Pollerの数
 
     volumes:
       - ./zabbix-server/alertscripts:/usr/lib/zabbix/alertscripts
