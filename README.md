@@ -94,7 +94,7 @@ docker-compose up -d
 ## 🛠️ 停止・削除
 
 - 停止
-  ```bash
+```bash
 docker-compose stop
 ```
 
