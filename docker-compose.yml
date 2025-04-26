@@ -24,9 +24,6 @@ services:
       - TZ=${TZ}
       - ZBX_STARTIPMIPOLLERS=3 # IPMI Pollerの数
 
-    volumes:
-      - ./zabbix-server/alertscripts:/usr/lib/zabbix/alertscripts
-      - ./zabbix-server/externalscripts:/usr/lib/zabbix/externalscripts
     ports:
       - "10051:10051"
 
